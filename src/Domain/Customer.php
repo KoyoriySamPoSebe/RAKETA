@@ -1,17 +1,18 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Raketa\BackendTestTask\Domain;
 
-final readonly class Customer
+readonly class Customer
 {
     public function __construct(
-        private int $id,
+        private int    $id,
+        private string $uuid,
         private string $firstName,
         private string $lastName,
-        private string $middleName,
-        private string $email,
+        private string $middlename,
+        private string $email
     ) {
     }
 
@@ -20,23 +21,38 @@ final readonly class Customer
         return $this->id;
     }
 
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
     public function getFirstName(): string
     {
         return $this->firstName;
     }
 
+    public function getMiddleName(): string
+    {
+        return $this->middlename;
+    }
     public function getLastName(): string
     {
         return $this->lastName;
     }
-
-    public function getMiddleName(): string
-    {
-        return $this->middleName;
-    }
-
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            (int) $data['id']          ?? 0,
+            $data['uuid']              ?? '',
+            $data['firstName']         ?? '',
+            $data['lastName']          ?? '',
+            $data['middleName']        ?? '',
+            $data['email']             ?? ''
+        );
     }
 }

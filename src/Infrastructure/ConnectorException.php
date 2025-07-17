@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Raketa\BackendTestTask\Infrastructure;
 
-class ConnectorException implements \Throwable
+readonly class ConnectorException implements \Throwable
 {
     public function __construct(
         private string $message,
         private int $code,
-        private ?\Throwable $previous,
-    ) { }
+        private ?\Throwable $previous = null,
+    ) {
+    }
 
     public function getMessage(): string
     {
