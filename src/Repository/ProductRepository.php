@@ -1,11 +1,10 @@
 <?php
-
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Raketa\BackendTestTask\Repository;
 
 use Doctrine\DBAL\Connection;
-use Raketa\BackendTestTask\Repository\Entity\Product;
+use Raketa\BackendTestTask\Domain\Product;
 
 class ProductRepository
 {
@@ -18,12 +17,15 @@ class ProductRepository
 
     public function getByUuid(string $uuid): Product
     {
-        $row = $this->connection->fetchOne(
-            "SELECT * FROM products WHERE uuid = " . $uuid,
+        $row = $this->connection->fetchAssociative(
+            'SELECT id, uuid, is_active, category, name, description, thumbnail, price
+             FROM products
+             WHERE uuid = ?',
+            [$uuid]
         );
 
-        if (empty($row)) {
-            throw new Exception('Product not found');
+        if ($row === false) {
+            throw new \Exception('Product not found');
         }
 
         return $this->make($row);
@@ -31,11 +33,17 @@ class ProductRepository
 
     public function getByCategory(string $category): array
     {
+        $rows = $this->connection->fetchAllAssociative(
+            'SELECT id, uuid, is_active, category, name, description, thumbnail, price
+             FROM products
+             WHERE is_active = 1
+               AND category = ?',
+            [$category]
+        );
+
         return array_map(
-            static fn (array $row): Product => $this->make($row),
-            $this->connection->fetchAllAssociative(
-                "SELECT id FROM products WHERE is_active = 1 AND category = " . $category,
-            )
+            fn(array $row): Product => $this->make($row),
+            $rows
         );
     }
 
